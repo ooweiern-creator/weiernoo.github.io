@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>侦探笔记学习任务单 - 谁拿走了钱袋</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #2e3b2c 0%, #1f2a1c 100%);
+            font-family: 'Segoe UI', 'Roboto', 'Courier New', '华文楷书', 'Microsoft YaHei', monospace;
+            padding: 30px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* 主卡片：侦探档案风格 */
+        .detective-case {
+            max-width: 1100px;
+            width: 100%;
+            background: #fef7e0;
+            background-image: radial-gradient(#e8dbbf 1px, transparent 1px);
+            background-size: 20px 20px;
+            border-radius: 48px 32px 48px 32px;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,200,0.8);
+            overflow: hidden;
+            border: 1px solid #d6b575;
+        }
+
+        /* 档案头 */
+        .file-header {
+            background: #2c2416;
+            padding: 18px 30px;
+            border-bottom: 5px solid #c49a6c;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            color: #ffefcf;
+            font-family: 'Courier New', monospace;
+        }
+
+        .case-title {
+            font-size: 1.7rem;
+            letter-spacing: 4px;
+            font-weight: bold;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23c49a6c" width="20px" height="20px"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>') no-repeat left center;
+            background-size: 24px;
+            padding-left: 32px;
+        }
+
+        .case-ref {
+            font-size: 0.85rem;
+            background: #3e3320;
+            padding: 5px 12px;
+            border-radius: 30px;
+            letter-spacing: 1px;
+        }
+
+        /* 侦探笔记主体 */
+        .notebook {
+            padding: 25px 30px 35px;
+        }
+
+        .group-name {
+            background: #e9e0cd;
+            border-left: 12px solid #b87c4f;
+            padding: 10px 18px;
+            margin-bottom: 28px;
+            border-radius: 30px 12px 30px 12px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            font-size: 1.1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .group-name span {
+            background: #2c2416;
+            color: #ffefcf;
+            padding: 4px 14px;
+            border-radius: 40px;
+            font-family: monospace;
+        }
+
+        .group-name input {
+            flex: 2;
+            min-width: 160px;
+            background: #fffaf0;
+            border: 1px solid #c0a16b;
+            padding: 8px 14px;
+            font-size: 1rem;
+            border-radius: 40px;
+            outline: none;
+            font-family: inherit;
+            transition: 0.2s;
+        }
+
+        .group-name input:focus {
+            border-color: #8b5a2b;
+            box-shadow: 0 0 0 2px #f3d9a4;
+        }
+
+        /* 任务卡片 侦探三步骤 */
+        .task-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .task-card {
+            background: #ffffffd9;
+            backdrop-filter: blur(1px);
+            border-radius: 32px;
+            padding: 18px 24px;
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.1);
+            border: 1px solid #efdfb7;
+            transition: all 0.2s;
+        }
+
+        .task-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 3px dashed #dbb879;
+            padding-bottom: 8px;
+        }
+
+        .task-num {
+            background: #2c3e2b;
+            color: #ffefb9;
+            width: 38px;
+            height: 38px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 1.3rem;
+            font-weight: bold;
+            box-shadow: inset 0 -1px 0 #1e2a1c, 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .task-icon {
+            font-size: 1.8rem;
+        }
+
+        /* 线索区格子 */
+        .clue-box {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            margin-top: 8px;
+        }
+
+        .clue-item {
+            background: #fef4e2;
+            border-radius: 20px;
+            padding: 10px 16px;
+            border-left: 8px solid #a5703e;
+        }
+
+        .clue-label {
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: #5c3e1f;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .clue-label i {
+            font-style: normal;
+            font-size: 1.1rem;
+        }
+
+        textarea, .text-input-style {
+            width: 100%;
+            background: #fffcf5;
+            border: 1px solid #e2cfaa;
+            border-radius: 20px;
+            padding: 12px 16px;
+            font-size: 0.95rem;
+            font-family: 'Segoe UI', 'Courier New', monospace;
+            resize: vertical;
+            transition: 0.2s;
+        }
+
+        textarea:focus {
+            border-color: #b87c4f;
+            outline: none;
+            box-shadow: 0 0 0 3px #f5e2b9;
+        }
+
+        .contradiction-row {
+            background: #faf2e2;
+            border-radius: 20px;
+            padding: 12px 16px;
+            margin-bottom: 14px;
+            border: 1px solid #eedfb8;
+        }
+
+        .person-name {
+            font-weight: 800;
+            font-size: 1.1rem;
+            background: #e1cfaa;
+            display: inline-block;
+            padding: 2px 14px;
+            border-radius: 50px;
+            margin-bottom: 10px;
+        }
+
+        .reason-list {
+            margin-top: 14px;
+            padding-left: 8px;
+        }
+
+        .evi-text {
+            background: #fff5e6;
+            padding: 8px 14px;
+            border-radius: 24px;
+            margin-top: 8px;
+            font-style: italic;
+            border-left: 3px solid #b87c4f;
+        }
+
+        .final-suspect {
+            background: #2f2a1f;
+            color: #f7e9c3;
+            border-radius: 28px;
+            padding: 20px 24px;
+            margin-top: 15px;
+        }
+
+        .final-suspect label {
+            font-weight: bold;
+            font-size: 1.2rem;
+            display: block;
+            margin-bottom: 12px;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: flex-end;
+            gap: 18px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .print-btn {
+            background: #4a6b3f;
+            border: none;
+            padding: 10px 28px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 40px;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: monospace;
+        }
+
+        .print-btn:hover {
+            background: #2c4d2a;
+            transform: scale(0.97);
+        }
+
+        .reset-btn {
+            background: #8b6946;
+        }
+
+        .teacher-tip {
+            background: #e8dcc8;
+            margin-top: 28px;
+            padding: 15px 20px;
+            border-radius: 28px;
+            border-left: 10px solid #c49a6c;
+            font-size: 0.85rem;
+            color: #2c2b26;
+        }
+
+        @media (max-width: 650px) {
+            .notebook {
+                padding: 20px 18px;
+            }
+            .task-title {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="detective-case">
+    <div class="file-header">
+        <div class="case-title">🕵️‍♂️ 侦探笔记 · 列车失窃案</div>
+        <div class="case-ref">档案号: C-0321 | 绝密 · 推理任务单</div>
+    </div>
+    <div class="notebook">
+        <!-- 小组信息 -->
+        <div class="group-name">
+            <span>🔍 探案小组</span>
+            <input type="text" placeholder="输入组名 / 侦探代号 (例: 真相组)" id="groupNameInput">
+        </div>
+
+        <div class="task-grid">
+            <!-- 任务1：找线索 -->
+            <div class="task-card">
+                <div class="task-title">
+                    <span class="task-num">1</span>
+                    <span class="task-icon">🔎</span>
+                    <span>任务一 · 收集线索</span>
+                </div>
+                <div class="clue-box">
+                    <div class="clue-item">
+                        <div class="clue-label">📌 线索 ① &nbsp;&nbsp; (可疑物品/细节)</div>
+                        <textarea rows="2" placeholder="例：制服上有两个疑似针孔的小洞。 或 “靠近车门的侧边有两支抽了一半的香烟”……" id="clue1"></textarea>
+                    </div>
+                    <div class="clue-item">
+                        <div class="clue-label">📌 线索 ②</div>
+                        <textarea rows="2" placeholder="写出课文中的第二条重要线索" id="clue2"></textarea>
+                    </div>
+                    <div class="clue-item">
+                        <div class="clue-label">📌 线索 ③ (优等生挑战区)</div>
+                        <textarea rows="2" placeholder="第三条隐藏线索？例如：戒指划伤脸、徽章、一跛一跛的乘务员……" id="clue3"></textarea>
+                    </div>
+                </div>
+                <div class="teacher-tip" style="margin-top: 12px; background:#f6efdf;">
+                    💡 提示：注意比尔制服上的小洞、香烟、徽章、乘务员的腿伤。
+                </div>
+            </div>
+
+            <!-- 任务2：找矛盾 (三人说法对比) -->
+            <div class="task-card">
+                <div class="task-title">
+                    <span class="task-num">2</span>
+                    <span class="task-icon">⚖️</span>
+                    <span>任务二 · 发现矛盾</span>
+                </div>
+                <div class="contradiction-row">
+                    <div class="person-name">👤 比尔 (押运专员)</div>
+                    <textarea rows="2" placeholder="他的说法哪里奇怪？ 提示：他说被一拳打晕，但制服上有针孔；且现场有香烟但他不抽烟？" id="billContra"></textarea>
+                </div>
+                <div class="contradiction-row">
+                    <div class="person-name">🚂 乘务员</div>
+                    <textarea rows="2" placeholder="乘务员的说法是否有不合理？例如：一跛一跛，却说被撞倒后立刻把‘炸弹’丢出窗外，没看清歹徒……" id="guardContra"></textarea>
+                </div>
+                <div class="contradiction-row">
+                    <div class="person-name">🚆 司机</div>
+                    <textarea rows="2" placeholder="司机的辩解有无可疑？‘理直气壮’但完全不管异常跳车……" id="driverContra"></textarea>
+                </div>
+                <div class="teacher-tip">
+                    🧠 关键矛盾点参考：三个人都说不抽烟 → 现场有两支香烟； 比尔声称被打晕却有针孔； 乘务员丢“炸弹”却不报警； 司机对跳车无动于衷。
+                </div>
+            </div>
+
+            <!-- 任务3：推理结论 必须课文证据 -->
+            <div class="task-card">
+                <div class="task-title">
+                    <span class="task-num">3</span>
+                    <span class="task-icon">🔍🔗</span>
+                    <span>任务三 · 终极推理</span>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="font-weight: bold; display: block; margin-bottom: 8px;">🕵️ 我认为最可疑的人是：</label>
+                    <select id="suspectSelect" style="width: 100%; padding: 12px; border-radius: 40px; border: 1px solid #c7aa75; background: #fffcf0; font-weight: bold; font-size: 1rem;">
+                        <option value="">—— 请选择嫌疑人 ——</option>
+                        <option value="比尔">比尔 (押运专员)</option>
+                        <option value="乘务员">乘务员</option>
+                        <option value="司机">司机</option>
+                        <option value="其他可能">其他可能 (另有同党)</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 18px;">
+                    <label style="font-weight: bold; display: block; margin-bottom: 8px;">📖 课文证据1 (必须引用课文原句或关键细节)</label>
+                    <textarea rows="2" placeholder="例：课文里说“比尔制服上有两个疑似针孔的小洞”，说明他可能被注射药物而非打晕。" id="evidence1"></textarea>
+                </div>
+                <div style="margin-bottom: 18px;">
+                    <label style="font-weight: bold; display: block; margin-bottom: 8px;">📖 课文证据2</label>
+                    <textarea rows="2" placeholder="另一处证据，比如香烟矛盾：三人都不抽烟，香烟却在车厢内，只有比尔一直待在车厢。" id="evidence2"></textarea>
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <label style="font-weight: bold; display: block; margin-bottom: 8px;">📖 证据3 (优等生/额外佐证)</label>
+                    <textarea rows="2" placeholder="徽章、戒指划伤、乘务员走路一跛一跛却称被撞后立即丢炸弹..." id="evidence3"></textarea>
+                </div>
+                <div class="final-suspect">
+                    <label>⚡ 侦探总结陈词</label>
+                    <textarea rows="2" placeholder="结合以上证据，说出你的完整推理：因为……所以我认为……" id="finalReason" style="background:#fff2e0; color:#2c2416;"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- 评估标准 & 小组互评区域 -->
+        <div class="teacher-tip" style="background: #e2d2b6; margin-top: 25px;">
+            <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                <div><strong>🏆 优秀推理标准</strong><br>✔ 有课文证据  ✔ 讲得清楚  ✔ 逻辑合理</div>
+                <div><strong>👥 同伴互评留言</strong><br><textarea rows="2" placeholder="其他小组/同学给出的建议或补充证据..." id="peerFeedback" style="width: 240px; background:#fffcf0;"></textarea></div>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button class="print-btn reset-btn" id="resetBtn">🗑️ 清空笔记</button>
+            <button class="print-btn" id="printBtn">🖨️ 打印侦探笔记 / 保存PDF</button>
+        </div>
+        <div class="teacher-tip" style="margin-top: 15px; text-align: center; font-size:0.75rem;">
+            🔎 侦探法则：先找线索 → 对比矛盾 → 证据推理。记住，每一句指控都要回到课文！
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // 存储所有输入字段id，方便重置
+        const inputIds = [
+            'groupNameInput',
+            'clue1', 'clue2', 'clue3',
+            'billContra', 'guardContra', 'driverContra',
+            'evidence1', 'evidence2', 'evidence3',
+            'finalReason', 'peerFeedback'
+        ];
+        const selectId = 'suspectSelect';
+
+        // 重置功能
+        function resetAllFields() {
+            inputIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            });
+            const selectEl = document.getElementById(selectId);
+            if (selectEl) selectEl.value = '';
+            // 可选友好提示
+            alert('🧹 侦探笔记已清空，可以重新填写推理！');
+        }
+
+        // 打印功能 (保留填写内容打印，样式适配打印)
+        function printTask() {
+            // 临时为打印优化样式，保存原始标题
+            const originalTitle = document.title;
+            document.title = "侦探笔记 - 列车失窃案推理任务单";
+            const printContents = document.querySelector('.detective-case').cloneNode(true);
+            // 移除不必要的按钮交互克隆事件，但保留内容
+            const clonedPrintBtn = printContents.querySelector('#printBtn');
+            const clonedResetBtn = printContents.querySelector('#resetBtn');
+            if(clonedPrintBtn) clonedPrintBtn.remove();
+            if(clonedResetBtn) clonedResetBtn.remove();
+            
+            // 创建新窗口打印
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>侦探笔记 - 列车失窃案</title>
+                    <style>
+                        body {
+                            font-family: 'Courier New', 'Segoe UI', '宋体', monospace;
+                            background: white;
+                            padding: 30px 20px;
+                            margin:0;
+                        }
+                        .detective-case {
+                            max-width: 1100px;
+                            margin:0 auto;
+                            background: #fef7e0;
+                            border-radius: 24px;
+                            padding: 10px;
+                            box-shadow: none;
+                        }
+                        .file-header, .notebook {
+                            padding: 10px 20px;
+                        }
+                        textarea {
+                            border: 1px solid #aaa;
+                            background: #fffcf5;
+                            resize: none;
+                            min-height: 55px;
+                        }
+                        .btn-group, .print-btn, .reset-btn {
+                            display: none;
+                        }
+                        .task-card {
+                            break-inside: avoid;
+                            page-break-inside: avoid;
+                        }
+                        .teacher-tip {
+                            background: #f1ebdb;
+                        }
+                        input, textarea, select {
+                            border: 1px solid #9b7a4a;
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${printContents.outerHTML}
+                    <div style="text-align:center; margin-top:30px; font-size:12px; color:#555;">—— 侦探笔记·基于课文证据推理 ——</div>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+            document.title = originalTitle;
+        }
+
+        // 绑定按钮
+        const resetBtn = document.getElementById('resetBtn');
+        const printBtn = document.getElementById('printBtn');
+        if(resetBtn) resetBtn.addEventListener('click', resetAllFields);
+        if(printBtn) printBtn.addEventListener('click', printTask);
+
+        // 可选自动保存 localStorage 增强用户体验（简单保存）
+        function autoSave() {
+            const allFields = [...inputIds, selectId];
+            allFields.forEach(id => {
+                const el = document.getElementById(id);
+                if(el) {
+                    const val = (el.tagName === 'TEXTAREA' || el.tagName === 'INPUT' || el.tagName === 'SELECT') ? el.value : '';
+                    localStorage.setItem(`detective_${id}`, val);
+                }
+            });
+        }
+        function loadSaved() {
+            const allFields = [...inputIds, selectId];
+            allFields.forEach(id => {
+                const saved = localStorage.getItem(`detective_${id}`);
+                if(saved !== null) {
+                    const el = document.getElementById(id);
+                    if(el) el.value = saved;
+                }
+            });
+        }
+        // 监听输入变化自动保存
+        function bindAutoSave() {
+            const allFields = [...inputIds, selectId];
+            allFields.forEach(id => {
+                const el = document.getElementById(id);
+                if(el) {
+                    el.addEventListener('input', autoSave);
+                    el.addEventListener('change', autoSave);
+                }
+            });
+        }
+        // 页面加载读取上次保存
+        loadSaved();
+        bindAutoSave();
+        // 重置时同时清除localStorage
+        const originalReset = resetAllFields;
+        window.resetAllFields = function() {
+            const allFields = [...inputIds, selectId];
+            allFields.forEach(id => localStorage.removeItem(`detective_${id}`));
+            originalReset();
+        };
+        resetBtn.onclick = function() {
+            const allFields = [...inputIds, selectId];
+            allFields.forEach(id => localStorage.removeItem(`detective_${id}`));
+            originalReset();
+        };
+    })();
+</script>
+</body>
+</html>
